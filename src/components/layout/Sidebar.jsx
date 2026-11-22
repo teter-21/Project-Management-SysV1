@@ -6,7 +6,10 @@ import {
   Users,
   Settings,
   X,
+  LogOut,
 } from "lucide-react";
+import { useState } from "react";
+import { useAuth } from "../../hooks/useAuth";
 
 const navigation = [
   {
@@ -37,6 +40,35 @@ const navigation = [
 ];
 
 function Sidebar({ isOpen, onClose }) {
+  const { user, signOut } = useAuth();
+  const [logoutError, setLogoutError] = useState("");
+  const [loggingOut, setLoggingOut] = useState(false);
+
+  const fullName = user?.user_metadata?.full_name || "TaskFlow User";
+
+  const initials = fullName
+    .trim()
+    .split(/\s+/)
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase() || "")
+    .join("");
+
+  async function handleLogout() {
+    if (loggingOut) return;
+
+    setLogoutError("");
+    setLoggingOut(true);
+
+    try {
+      await signOut();
+      onClose();
+    } catch (err) {
+      console.error("Logout failed:", err.message);
+      setLogoutError("Could not sign out. Please try again.");
+    } finally {
+      setLoggingOut(false);
+    }
+  }
   return (
     <>
       {isOpen && (
@@ -86,11 +118,30 @@ function Sidebar({ isOpen, onClose }) {
         </nav>
 
         <div className="sidebar-footer">
-          <div className="user-avatar">DU</div>
-          <div>
-            <strong>Demo User</strong>
-            <p>Workspace Member</p>
+          <div className="sidebar-user">
+            <div className="user-avatar">{initials || "U"}</div>
+
+            <div className="sidebar-user-info">
+              <strong>{fullName}</strong>
+              <p title={user?.email}>{user?.email}</p>
+            </div>
           </div>
+
+          {logoutError && (
+            <p className="logout-error" role="alert">
+              {logoutError}
+            </p>
+          )}
+
+          <button
+            type="button"
+            className="logout-button"
+            onClick={handleLogout}
+            disabled={loggingOut}
+          >
+            <LogOut size={18} />
+            {loggingOut ? "Signing you out..." : "Sign Out"}
+          </button>
         </div>
       </aside>
     </>
