@@ -8,6 +8,7 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
 import Projects from "./pages/Projects";
+import ProjectDetails from "./pages/ProjectDetails";
 import MyTasks from "./pages/MyTasks";
 import TeamMembers from "./pages/TeamMembers";
 import Settings from "./pages/Settings";
@@ -29,6 +30,7 @@ function App() {
           <Route path="/" element={<Navigate to="/dashboard" replace />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/projects" element={<Projects />} />
+          <Route path="/projects/:projectId" element={<ProjectDetails />} />
           <Route path="/my-tasks" element={<MyTasks />} />
           <Route path="/team" element={<TeamMembers />} />
           <Route path="/settings" element={<Settings />} />

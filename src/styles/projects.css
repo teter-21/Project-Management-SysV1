@@ -1,21 +1,43 @@
-/* ==============================
-   TASKFLOW - PROJECT MANAGEMENT
-   ============================== */
+/* TaskFlow — Phase 5 Project Management */
 
-/* Buttons */
+.page-toolbar,
+.project-title-row,
+.project-actions,
+.section-title-row,
+.project-link,
+.back-link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.page-toolbar {
+  justify-content: space-between;
+  flex-wrap: wrap;
+  margin-bottom: 24px;
+}
+
+.page-toolbar .page-heading {
+  margin-bottom: 0;
+}
+
+.project-actions {
+  flex-wrap: wrap;
+}
+
 .btn-primary,
 .btn-secondary,
 .btn-danger {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: 9px;
   padding: 11px 16px;
   border-radius: 9px;
   font-size: 13px;
   font-weight: 600;
   border: 1px solid transparent;
-  cursor: pointer;
+  transition: background 0.2s;
 }
 
 .btn-primary {
@@ -23,7 +45,7 @@
   color: white;
 }
 
-.btn-primary:hover {
+.btn-primary:hover:not(:disabled) {
   background: #4f46e5;
 }
 
@@ -33,35 +55,122 @@
   border-color: #334155;
 }
 
+.btn-secondary:hover:not(:disabled) {
+  background: #334155;
+}
+
 .btn-danger {
   background: #451a1a;
   color: #fca5a5;
   border-color: #7f1d1d;
 }
 
-button:disabled {
+.btn-danger:hover:not(:disabled) {
+  background: #641e1e;
+}
+
+.btn-primary:disabled,
+.btn-secondary:disabled,
+.btn-danger:disabled {
   opacity: 0.6;
   cursor: not-allowed;
 }
 
-/* Page toolbar */
-.page-toolbar {
+/* Project list */
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 12px;
+  padding: 55px 24px;
+  color: #94a3b8;
+}
+
+.empty-state h2 {
+  color: #e2e8f0;
+  margin: 0;
+}
+
+.empty-state p {
+  margin: 0 0 12px;
+}
+
+.project-link,
+.back-link {
+  color: #a5b4fc;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.project-link:hover,
+.back-link:hover {
+  color: #c7d2fe;
+}
+
+.back-link {
+  margin-bottom: 28px;
+  width: fit-content;
+}
+
+/* Project details */
+
+.project-detail-heading {
+  align-items: flex-start;
+}
+
+.project-title-row {
+  flex-wrap: wrap;
+}
+
+.project-title-row h1 {
+  margin: 0;
+}
+
+.project-detail-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr);
+  gap: 20px;
+  align-items: start;
+}
+
+.project-info {
+  margin: 0;
+}
+
+.project-info > div {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
   gap: 16px;
-  margin-bottom: 24px;
+  border-bottom: 1px solid #293548;
+  padding: 16px 0;
 }
 
-.page-toolbar .page-heading {
-  margin-bottom: 0;
+.project-info dt {
+  color: #94a3b8;
+  font-size: 13px;
 }
 
-/* Project modal */
+.project-info dd {
+  margin: 0;
+  font-size: 13px;
+  text-align: right;
+}
+
+.section-title-row {
+  margin-bottom: 22px;
+}
+
+.section-title-row h2 {
+  margin: 0;
+}
+
+/* Modal */
+
 .project-dialog {
   width: min(480px, calc(100% - 32px));
-  max-height: 90vh;
+  max-height: min(90vh, 800px);
   overflow-y: auto;
   margin: auto;
   padding: 28px;
@@ -73,14 +182,14 @@ button:disabled {
 
 .project-dialog::backdrop {
   background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(3px);
 }
 
 .modal-heading {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  gap: 12px;
-  margin-bottom: 24px;
+  justify-content: space-between;
+  margin-bottom: 25px;
 }
 
 .modal-heading h2 {
@@ -88,17 +197,15 @@ button:disabled {
   font-size: 20px;
 }
 
-/* Project form */
-.project-form {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
+.project-form,
 .form-field {
   display: flex;
   flex-direction: column;
   gap: 10px;
+}
+
+.project-form {
+  gap: 20px;
 }
 
 .form-field label {
@@ -108,20 +215,21 @@ button:disabled {
 
 .form-field input,
 .form-field textarea,
-.form-field select {
+.form-field select,
+.member-actions select {
   width: 100%;
   padding: 12px;
-  background: #0f172a;
   color: #e2e8f0;
+  background: #0f172a;
   border: 1px solid #334155;
   border-radius: 9px;
-  font: inherit;
+  outline: none;
 }
 
 .form-field input:focus,
-.form-field textarea:focus {
-  outline: 2px solid #818cf8;
-  outline-offset: 1px;
+.form-field textarea:focus,
+.form-field select:focus {
+  border-color: #818cf8;
 }
 
 .form-field textarea {
@@ -135,10 +243,10 @@ button:disabled {
 }
 
 .form-error {
-  padding: 12px;
-  background: rgba(239, 68, 68, 0.1);
   color: #fca5a5;
-  border-radius: 8px;
+  padding: 12px;
+  border-radius: 9px;
+  background: rgba(239, 68, 68, 0.1);
   font-size: 13px;
 }
 
@@ -147,82 +255,34 @@ button:disabled {
   font-size: 13px;
 }
 
-/* Project details */
-.project-title-row,
-.project-actions,
-.section-title-row,
-.back-link,
-.project-link {
-  display: flex;
-  align-items: center;
+/* Members */
+
+.members-panel {
+  display: grid;
+  gap: 24px;
+}
+
+.members-list {
+  display: grid;
   gap: 12px;
 }
 
-.project-title-row,
-.project-actions {
-  flex-wrap: wrap;
-}
-
-.project-link,
-.back-link {
-  color: #a5b4fc;
-  font-size: 13px;
-  font-weight: 600;
-}
-
-.back-link {
-  margin-bottom: 28px;
-  width: fit-content;
-}
-
-.project-detail-grid {
-  display: grid;
-  grid-template-columns: 1fr 1.3fr;
-  gap: 20px;
-  align-items: start;
-}
-
-.project-info > div {
+.member-row {
   display: flex;
+  align-items: center;
   justify-content: space-between;
-  gap: 16px;
-  padding: 16px 0;
-  border-bottom: 1px solid #334155;
+  gap: 12px;
+  padding: 12px;
+  background: #111827;
+  border: 1px solid #334155;
+  border-radius: 10px;
 }
 
-.project-info dt {
-  color: #94a3b8;
-}
-
-.project-info dd {
-  margin: 0;
-}
-
-/* Team members */
-.members-panel,
-.members-list,
-.member-add-form {
-  display: grid;
-  gap: 16px;
-}
-
-.member-row,
 .member-identity,
 .member-actions {
   display: flex;
   align-items: center;
   gap: 12px;
-}
-
-.member-row {
-  justify-content: space-between;
-  padding: 12px;
-  border: 1px solid #334155;
-  border-radius: 10px;
-  background: #111827;
-}
-
-.member-identity {
   min-width: 0;
 }
 
@@ -235,6 +295,7 @@ button:disabled {
 
 .member-details strong {
   font-size: 13px;
+  overflow-wrap: anywhere;
 }
 
 .member-details span {
@@ -244,11 +305,9 @@ button:disabled {
 }
 
 .member-actions select {
+  width: auto;
   padding: 8px;
-  background: #0f172a;
-  color: #e2e8f0;
-  border: 1px solid #334155;
-  border-radius: 8px;
+  font-size: 12px;
 }
 
 .member-remove {
@@ -256,29 +315,49 @@ button:disabled {
 }
 
 .member-add-form {
+  display: grid;
+  gap: 15px;
   padding-top: 20px;
   border-top: 1px solid #334155;
 }
 
+.member-add-form h3 {
+  margin: 0;
+  font-size: 15px;
+}
+
 /* Responsive */
-@media (max-width: 900px) {
+
+@media (max-width: 1100px) {
   .project-detail-grid {
     grid-template-columns: 1fr;
   }
 }
 
 @media (max-width: 640px) {
-  .project-dialog {
-    padding: 20px;
+  .page-toolbar {
+    align-items: stretch;
   }
 
   .project-actions {
     width: 100%;
   }
 
+  .project-actions button {
+    flex: 1;
+  }
+
   .member-row {
-    flex-direction: column;
     align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .member-actions {
+    margin-left: auto;
+  }
+
+  .project-dialog {
+    padding: 20px;
   }
 
   .form-actions {

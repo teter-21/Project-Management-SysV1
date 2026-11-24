@@ -116,27 +116,11 @@ function Projects() {
       )}
 
       {modalOpen && (
-        <>
-          <p
-            style={{
-              position: "fixed",
-              top: 10,
-              right: 10,
-              zIndex: 9999,
-              background: "red",
-              color: "white",
-              padding: "12px",
-            }}
-          >
-            MODAL STATE IS TRUE
-          </p>
-
-          <ProjectModal
-            onClose={() => setModalOpen(false)}
-            onSubmit={handleCreate}
-            submitting={saving}
-          />
-        </>
+        <ProjectModal
+          onClose={() => setModalOpen(false)}
+          onSubmit={handleCreate}
+          submitting={saving}
+        />
       )}
     </section>
   );
