@@ -14,6 +14,7 @@ import Settings from "./pages/Settings";
 
 import "./styles/layout.css";
 import "./styles/auth.css";
+import "./styles/projects.css";
 
 function App() {
   return (

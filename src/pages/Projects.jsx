@@ -1,15 +1,19 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router";
+import { Plus, FolderKanban, ArrowRight } from "lucide-react";
 
 import {
-  createProject,
   getProjects,
+  createProject,
 } from "../features/projects/projectService";
+
+import ProjectModal from "../components/projects/ProjectModal";
 
 function Projects() {
   const [projects, setProjects] = useState([]);
-  const [name, setName] = useState("");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [modalOpen, setModalOpen] = useState(false);
   const [error, setError] = useState("");
 
   useEffect(() => {
@@ -19,17 +23,11 @@ function Projects() {
       try {
         const data = await getProjects();
 
-        if (active) {
-          setProjects(data);
-        }
+        if (active) setProjects(data);
       } catch (err) {
-        if (active) {
-          setError(err.message);
-        }
+        if (active) setError(err.message);
       } finally {
-        if (active) {
-          setLoading(false);
-        }
+        if (active) setLoading(false);
       }
     }
 
@@ -40,25 +38,15 @@ function Projects() {
     };
   }, []);
 
-  async function handleCreateProject(event) {
-    event.preventDefault();
-
-    if (saving) return;
-
+  async function handleCreate(values) {
     setSaving(true);
-    setError("");
 
     try {
-      const newProject = await createProject({
-        name,
-        description: "",
-      });
+      const project = await createProject(values);
 
-      setProjects((previous) => [newProject, ...previous]);
+      setProjects((previous) => [project, ...previous]);
 
-      setName("");
-    } catch (err) {
-      setError(err.message);
+      setModalOpen(false);
     } finally {
       setSaving(false);
     }
@@ -66,76 +54,90 @@ function Projects() {
 
   return (
     <section className="page">
-      <div className="page-heading">
-        <h1>Projects</h1>
-        <p>Manage your team projects.</p>
+      <div className="page-toolbar">
+        <div className="page-heading">
+          <h1>Projects</h1>
+          <p>Organize and manage your team projects.</p>
+        </div>
+
+        <button className="btn-primary" onClick={() => setModalOpen(true)}>
+          <Plus size={18} />
+          New Project
+        </button>
       </div>
 
-      <div className="section-card">
-        <h2>Create Project</h2>
+      {error && (
+        <p className="form-error" role="alert">
+          {error}
+        </p>
+      )}
 
-        <form
-          onSubmit={handleCreateProject}
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-            gap: "12px",
-            marginBottom: "24px",
-          }}
-        >
-          <input
-            type="text"
-            placeholder="Enter project name"
-            aria-label="Project name"
-            value={name}
-            onChange={(event) => setName(event.target.value)}
-            maxLength={150}
-            required
-            style={{
-              flex: "1 1 200px",
-              padding: "12px",
-              borderRadius: "8px",
-              border: "1px solid #334155",
-              background: "#0f172a",
-              color: "#fff",
-            }}
-          />
+      {loading ? (
+        <div className="section-card" role="status">
+          Loading your projects...
+        </div>
+      ) : projects.length === 0 ? (
+        <div className="section-card empty-state">
+          <FolderKanban size={40} />
 
-          <button
-            type="submit"
-            disabled={saving}
-            className="auth-submit"
-            style={{ width: "auto", marginTop: 0 }}
-          >
-            {saving ? "Creating..." : "Create Project"}
+          <h2>No projects yet</h2>
+          <p>Create your first project to get started.</p>
+
+          <button className="btn-primary" onClick={() => setModalOpen(true)}>
+            <Plus size={18} />
+            Create Project
           </button>
-        </form>
-
-        {error && (
-          <p role="alert" style={{ color: "#fca5a5" }}>
-            {error}
-          </p>
-        )}
-
-        <h2>My Projects</h2>
-
-        {loading ? (
-          <p>Loading projects...</p>
-        ) : projects.length === 0 ? (
-          <p>No projects found. Create your first project.</p>
-        ) : (
-          <div className="project-grid">
-            {projects.map((project) => (
-              <article className="project-card" key={project.id}>
+        </div>
+      ) : (
+        <div className="project-grid">
+          {projects.map((project) => (
+            <article key={project.id} className="project-card">
+              <div className="project-card-top">
                 <h3>{project.name}</h3>
-                <p>{project.description || "No description"}</p>
 
                 <span className="status-badge">{project.status}</span>
-              </article>
-            ))}
-          </div>
-        )}
-      </div>
+              </div>
+
+              <p>{project.description || "No description provided."}</p>
+
+              <div className="project-footer">
+                <span>
+                  Created {new Date(project.created_at).toLocaleDateString()}
+                </span>
+
+                <Link to={`/projects/${project.id}`} className="project-link">
+                  View Details
+                  <ArrowRight size={16} />
+                </Link>
+              </div>
+            </article>
+          ))}
+        </div>
+      )}
+
+      {modalOpen && (
+        <>
+          <p
+            style={{
+              position: "fixed",
+              top: 10,
+              right: 10,
+              zIndex: 9999,
+              background: "red",
+              color: "white",
+              padding: "12px",
+            }}
+          >
+            MODAL STATE IS TRUE
+          </p>
+
+          <ProjectModal
+            onClose={() => setModalOpen(false)}
+            onSubmit={handleCreate}
+            submitting={saving}
+          />
+        </>
+      )}
     </section>
   );
 }

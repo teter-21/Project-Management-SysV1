@@ -1,5 +1,17 @@
 import { supabase } from "../../lib/supabaseClient";
 
+function validateProject(values) {
+  const name = values.name?.trim();
+  const description = values.description?.trim() ?? "";
+
+  if (!name || name.length > 150) {
+    throw new Error("Project name must be between 1 and 150 characters.");
+  }
+
+  return { name, description };
+}
+
+// READ — all projects accessible to the current user
 export async function getProjects() {
   const { data, error } = await supabase
     .from("projects")
@@ -7,67 +19,80 @@ export async function getProjects() {
     .order("created_at", { ascending: false });
 
   if (error) throw error;
-
   return data;
 }
 
-export async function createProject({ name, description = "" }) {
+// READ — one project
+export async function getProjectById(projectId) {
+  const { data, error } = await supabase
+    .from("projects")
+    .select("*")
+    .eq("id", projectId)
+    .maybeSingle();
+
+  if (error) throw error;
+  return data;
+}
+
+// CREATE
+export async function createProject(values) {
+  const validated = validateProject(values);
+
   const {
     data: { user },
-    error: userError,
+    error: authError,
   } = await supabase.auth.getUser();
 
-  if (userError) throw userError;
-  if (!user) throw new Error("Authentication required.");
-
-  const cleanName = name.trim();
-
-  if (!cleanName || cleanName.length > 150) {
-    throw new Error("Project name must contain 1–150 characters.");
-  }
+  if (authError) throw authError;
+  if (!user) throw new Error("You must be logged in.");
 
   const { data, error } = await supabase
     .from("projects")
     .insert({
-      name: cleanName,
-      description,
+      ...validated,
       owner_id: user.id,
+      status: "active",
     })
     .select()
     .single();
 
   if (error) throw error;
-
   return data;
 }
 
-export async function updateProject(projectId, updates) {
-  const allowedUpdates = {};
-
-  if (updates.name !== undefined) {
-    allowedUpdates.name = updates.name.trim();
-  }
-
-  if (updates.description !== undefined) {
-    allowedUpdates.description = updates.description;
-  }
-
-  if (updates.status !== undefined) {
-    allowedUpdates.status = updates.status;
-  }
+// UPDATE
+export async function updateProject(projectId, values) {
+  const validated = validateProject(values);
 
   const { data, error } = await supabase
     .from("projects")
-    .update(allowedUpdates)
+    .update(validated)
     .eq("id", projectId)
     .select()
     .single();
 
   if (error) throw error;
-
   return data;
 }
 
+// ARCHIVE OR RESTORE
+export async function setProjectStatus(projectId, status) {
+  if (!["active", "archived"].includes(status)) {
+    throw new Error("Invalid project status.");
+  }
+
+  const { data, error } = await supabase
+    .from("projects")
+    .update({ status })
+    .eq("id", projectId)
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
+}
+
+// DELETE — permanent operation
 export async function deleteProject(projectId) {
   const { data, error } = await supabase
     .from("projects")
@@ -77,6 +102,5 @@ export async function deleteProject(projectId) {
     .single();
 
   if (error) throw error;
-
   return data;
 }

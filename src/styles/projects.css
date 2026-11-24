@@ -1,0 +1,291 @@
+/* ==============================
+   TASKFLOW - PROJECT MANAGEMENT
+   ============================== */
+
+/* Buttons */
+.btn-primary,
+.btn-secondary,
+.btn-danger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 11px 16px;
+  border-radius: 9px;
+  font-size: 13px;
+  font-weight: 600;
+  border: 1px solid transparent;
+  cursor: pointer;
+}
+
+.btn-primary {
+  background: #6366f1;
+  color: white;
+}
+
+.btn-primary:hover {
+  background: #4f46e5;
+}
+
+.btn-secondary {
+  background: #1e293b;
+  color: #e2e8f0;
+  border-color: #334155;
+}
+
+.btn-danger {
+  background: #451a1a;
+  color: #fca5a5;
+  border-color: #7f1d1d;
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Page toolbar */
+.page-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.page-toolbar .page-heading {
+  margin-bottom: 0;
+}
+
+/* Project modal */
+.project-dialog {
+  width: min(480px, calc(100% - 32px));
+  max-height: 90vh;
+  overflow-y: auto;
+  margin: auto;
+  padding: 28px;
+  border-radius: 16px;
+  border: 1px solid #334155;
+  background: #151f30;
+  color: #e2e8f0;
+}
+
+.project-dialog::backdrop {
+  background: rgba(0, 0, 0, 0.7);
+}
+
+.modal-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.modal-heading h2 {
+  margin: 0;
+  font-size: 20px;
+}
+
+/* Project form */
+.project-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.form-field label {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.form-field input,
+.form-field textarea,
+.form-field select {
+  width: 100%;
+  padding: 12px;
+  background: #0f172a;
+  color: #e2e8f0;
+  border: 1px solid #334155;
+  border-radius: 9px;
+  font: inherit;
+}
+
+.form-field input:focus,
+.form-field textarea:focus {
+  outline: 2px solid #818cf8;
+  outline-offset: 1px;
+}
+
+.form-field textarea {
+  resize: vertical;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.form-error {
+  padding: 12px;
+  background: rgba(239, 68, 68, 0.1);
+  color: #fca5a5;
+  border-radius: 8px;
+  font-size: 13px;
+}
+
+.form-success {
+  color: #86efac;
+  font-size: 13px;
+}
+
+/* Project details */
+.project-title-row,
+.project-actions,
+.section-title-row,
+.back-link,
+.project-link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.project-title-row,
+.project-actions {
+  flex-wrap: wrap;
+}
+
+.project-link,
+.back-link {
+  color: #a5b4fc;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.back-link {
+  margin-bottom: 28px;
+  width: fit-content;
+}
+
+.project-detail-grid {
+  display: grid;
+  grid-template-columns: 1fr 1.3fr;
+  gap: 20px;
+  align-items: start;
+}
+
+.project-info > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 0;
+  border-bottom: 1px solid #334155;
+}
+
+.project-info dt {
+  color: #94a3b8;
+}
+
+.project-info dd {
+  margin: 0;
+}
+
+/* Team members */
+.members-panel,
+.members-list,
+.member-add-form {
+  display: grid;
+  gap: 16px;
+}
+
+.member-row,
+.member-identity,
+.member-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.member-row {
+  justify-content: space-between;
+  padding: 12px;
+  border: 1px solid #334155;
+  border-radius: 10px;
+  background: #111827;
+}
+
+.member-identity {
+  min-width: 0;
+}
+
+.member-details {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+}
+
+.member-details strong {
+  font-size: 13px;
+}
+
+.member-details span {
+  font-size: 12px;
+  color: #94a3b8;
+  text-transform: capitalize;
+}
+
+.member-actions select {
+  padding: 8px;
+  background: #0f172a;
+  color: #e2e8f0;
+  border: 1px solid #334155;
+  border-radius: 8px;
+}
+
+.member-remove {
+  color: #fca5a5;
+}
+
+.member-add-form {
+  padding-top: 20px;
+  border-top: 1px solid #334155;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .project-detail-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .project-dialog {
+    padding: 20px;
+  }
+
+  .project-actions {
+    width: 100%;
+  }
+
+  .member-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .form-actions {
+    flex-direction: column-reverse;
+  }
+
+  .form-actions button {
+    width: 100%;
+  }
+}
