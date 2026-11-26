@@ -1,9 +1,11 @@
 import { Navigate, Route, Routes } from "react-router";
 
+// Components
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import PublicRoute from "./components/auth/PublicRoute";
 import AppLayout from "./components/layout/AppLayout";
 
+// Pages
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
@@ -13,9 +15,11 @@ import MyTasks from "./pages/MyTasks";
 import TeamMembers from "./pages/TeamMembers";
 import Settings from "./pages/Settings";
 
+// Styles
 import "./styles/layout.css";
 import "./styles/auth.css";
 import "./styles/projects.css";
+import "./styles/tasks.css";
 
 function App() {
   return (

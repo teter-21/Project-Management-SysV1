@@ -25,6 +25,8 @@ import { getProjectMembers } from "../features/members/memberService";
 import ProjectModal from "../components/projects/ProjectModal";
 import MembersPanel from "../components/projects/MembersPanel";
 
+import TasksSection from "../components/tasks/TasksSection";
+
 function ProjectDetails() {
   const { projectId } = useParams();
   const navigate = useNavigate();
@@ -252,6 +254,8 @@ function ProjectDetails() {
           />
         </div>
       </div>
+
+      <TasksSection key={projectId} projectId={projectId} members={members} />
 
       {editing && (
         <ProjectModal
