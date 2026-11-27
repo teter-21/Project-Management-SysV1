@@ -20,6 +20,7 @@ import "./styles/layout.css";
 import "./styles/auth.css";
 import "./styles/projects.css";
 import "./styles/tasks.css";
+import "./styles/kanban.css";
 
 function App() {
   return (

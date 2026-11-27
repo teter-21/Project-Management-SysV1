@@ -58,7 +58,9 @@ export async function getProjectTasks(projectId) {
     .from("tasks")
     .select("*")
     .eq("project_id", projectId)
-    .order("created_at", { ascending: false });
+    .order("position", { ascending: true })
+    .order("created_at", { ascending: true })
+    .order("id", { ascending: true });
 
   if (error) throw error;
   return data;
@@ -139,4 +141,25 @@ export async function deleteTask(projectId, taskId) {
 
   if (error) throw error;
   return data;
+}
+
+// Move and reorder a task.
+// The database handles all affected positions atomically.
+export async function moveTask(projectId, taskId, newStatus, newIndex) {
+  if (!["todo", "in_progress", "done"].includes(newStatus)) {
+    throw new Error("Invalid destination column.");
+  }
+
+  if (!Number.isInteger(newIndex) || newIndex < 0) {
+    throw new Error("Invalid task position.");
+  }
+
+  const { error } = await supabase.rpc("move_project_task", {
+    p_project_id: projectId,
+    p_task_id: taskId,
+    p_new_status: newStatus,
+    p_new_index: newIndex,
+  });
+
+  if (error) throw error;
 }

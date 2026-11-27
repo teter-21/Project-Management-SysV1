@@ -1,43 +1,89 @@
-import { FolderKanban, ListTodo, CircleCheck, Clock3 } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Link } from "react-router";
 
-import { projects } from "../data/mockData";
+import { FolderKanban, ListTodo, CircleCheck, ClockAlert } from "lucide-react";
 
-const totalTasks = projects.reduce((sum, project) => sum + project.tasks, 0);
-
-const completedTasks = projects.reduce(
-  (sum, project) => sum + project.completed,
-  0,
-);
-
-const stats = [
-  {
-    title: "Total Projects",
-    value: projects.length,
-    icon: FolderKanban,
-  },
-  {
-    title: "Total Tasks",
-    value: totalTasks,
-    icon: ListTodo,
-  },
-  {
-    title: "Completed Tasks",
-    value: completedTasks,
-    icon: CircleCheck,
-  },
-  {
-    title: "Pending Tasks",
-    value: totalTasks - completedTasks,
-    icon: Clock3,
-  },
-];
+import { getDashboardAnalytics } from "../features/dashboard/dashboardService";
 
 function Dashboard() {
+  const [analytics, setAnalytics] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    let active = true;
+
+    async function loadDashboard() {
+      try {
+        const data = await getDashboardAnalytics();
+
+        if (active) {
+          setAnalytics(data);
+        }
+      } catch (err) {
+        if (active) setError(err.message);
+      } finally {
+        if (active) setLoading(false);
+      }
+    }
+
+    loadDashboard();
+
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  if (loading) {
+    return (
+      <section className="page" role="status">
+        Loading dashboard...
+      </section>
+    );
+  }
+
+  if (error) {
+    return (
+      <section className="page">
+        <p className="form-error" role="alert">
+          Unable to load analytics: {error}
+        </p>
+      </section>
+    );
+  }
+
+  const stats = [
+    {
+      title: "Total Projects",
+      value: analytics.totalProjects,
+      icon: FolderKanban,
+    },
+    {
+      title: "Total Tasks",
+      value: analytics.totalTasks,
+      icon: ListTodo,
+    },
+    {
+      title: "Completed Tasks",
+      value: analytics.completedTasks,
+      icon: CircleCheck,
+    },
+    {
+      title: "Overdue Tasks",
+      value: analytics.overdueTasks,
+      icon: ClockAlert,
+    },
+  ];
+
+  const recentProjects = [...analytics.projectSummaries]
+    .sort((a, b) => b.created_at.localeCompare(a.created_at))
+    .slice(0, 6);
+
   return (
     <section className="page">
       <div className="page-heading">
         <h1>Dashboard</h1>
-        <p>Overview of your workspace.</p>
+        <p>Monitor project performance and task progress.</p>
       </div>
 
       <div className="stats-grid">
@@ -59,48 +105,60 @@ function Dashboard() {
 
       <div className="section-card">
         <div className="section-heading">
-          <h2>Recent Projects</h2>
-          <p>Monitor your ongoing projects.</p>
+          <h2>Project Progress</h2>
+          <p>Completion rates calculated from actual tasks.</p>
         </div>
 
-        <div className="project-grid">
-          {projects.map((project) => (
-            <article className="project-card" key={project.id}>
-              <div className="project-card-top">
-                <h3>{project.name}</h3>
-                <span className="status-badge">{project.status}</span>
-              </div>
+        {recentProjects.length === 0 ? (
+          <p>No projects found.</p>
+        ) : (
+          <div className="project-grid">
+            {recentProjects.map((project) => (
+              <article className="project-card" key={project.id}>
+                <div className="project-card-top">
+                  <h3>{project.name}</h3>
 
-              <p>{project.description}</p>
+                  <span className="status-badge">{project.status}</span>
+                </div>
 
-              <div className="progress-info">
-                <span>Progress</span>
-                <strong>{project.progress}%</strong>
-              </div>
+                <p>{project.description || "No description provided."}</p>
 
-              <div
-                className="progress-track"
-                role="progressbar"
-                aria-label={`${project.name} progress`}
-                aria-valuenow={project.progress}
-                aria-valuemin={0}
-                aria-valuemax={100}
-              >
+                <div className="progress-info">
+                  <span>
+                    {project.completedTasks}/{project.totalTasks} tasks
+                    completed
+                  </span>
+
+                  <strong>{project.progress}%</strong>
+                </div>
+
                 <div
-                  className="progress-fill"
-                  style={{ width: `${project.progress}%` }}
-                />
-              </div>
+                  className="progress-track"
+                  role="progressbar"
+                  aria-label={`${project.name} progress`}
+                  aria-valuemin={0}
+                  aria-valuemax={100}
+                  aria-valuenow={project.progress}
+                >
+                  <div
+                    className="progress-fill"
+                    style={{
+                      width: `${project.progress}%`,
+                    }}
+                  />
+                </div>
 
-              <div className="project-footer">
-                <span>
-                  {project.completed}/{project.tasks} tasks
-                </span>
-                <span>Due {project.dueDate}</span>
-              </div>
-            </article>
-          ))}
-        </div>
+                <div className="project-footer">
+                  <span>{project.totalTasks} total tasks</span>
+
+                  <Link to={`/projects/${project.id}`} className="project-link">
+                    View Project
+                  </Link>
+                </div>
+              </article>
+            ))}
+          </div>
+        )}
       </div>
     </section>
   );

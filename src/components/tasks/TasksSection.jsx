@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { Plus, Pencil, Trash2, ListTodo } from "lucide-react";
 
 import TaskForm from "./TaskForm";
+import KanbanBoard from "./KanbanBoard";
 
 import {
   getProjectTasks,
@@ -9,6 +10,7 @@ import {
   updateTask,
   updateTaskStatus,
   deleteTask,
+  moveTask,
   TASK_STATUSES,
   TASK_PRIORITIES,
 } from "../../features/tasks/taskService";
@@ -21,6 +23,7 @@ function TasksSection({ projectId, members = [] }) {
   const [editingTask, setEditingTask] = useState(null);
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
+  const [view, setView] = useState("board");
 
   const loadTasks = useCallback(async () => {
     const data = await getProjectTasks(projectId);
@@ -114,6 +117,13 @@ function TasksSection({ projectId, members = [] }) {
     );
   }
 
+  async function handleTaskMove(taskId, status, index) {
+    await runAction(
+      () => moveTask(projectId, taskId, status, index),
+      "Task moved successfully.",
+    );
+  }
+
   async function handleDelete(task) {
     if (busy) return;
 
@@ -163,6 +173,26 @@ function TasksSection({ projectId, members = [] }) {
           <Plus size={18} />
           New Task
         </button>
+
+        <div className="task-view-switcher">
+          <button
+            type="button"
+            className={view === "board" ? "view-active" : ""}
+            onClick={() => setView("board")}
+            aria-pressed={view === "board"}
+          >
+            Board
+          </button>
+
+          <button
+            type="button"
+            className={view === "list" ? "view-active" : ""}
+            onClick={() => setView("list")}
+            aria-pressed={view === "list"}
+          >
+            List
+          </button>
+        </div>
       </div>
 
       {error && (
@@ -213,6 +243,13 @@ function TasksSection({ projectId, members = [] }) {
           <h3>No tasks yet</h3>
           <p>Create the first task for this project.</p>
         </div>
+      ) : view === "board" ? (
+        <KanbanBoard
+          tasks={tasks}
+          members={members}
+          onMove={handleTaskMove}
+          disabled={busy}
+        />
       ) : (
         <div className="task-records">
           {tasks.map((task) => (
